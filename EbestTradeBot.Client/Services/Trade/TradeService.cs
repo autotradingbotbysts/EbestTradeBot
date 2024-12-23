@@ -66,14 +66,6 @@ namespace EbestTradeBot.Client.Services.Trade
 
             while (!_cancellationTokenSource.Token.IsCancellationRequested)
             {
-                DateTime now = DateTime.Now;
-
-                // 09:00 ~ 15:30 일경우 StopTrade() 호출
-                if (now.Hour < 9 || now.TimeOfDay >= new TimeSpan(15, 31, 00))
-                {
-                    throw new MarketClosedException();
-                }
-
                 Task? buyTask = null;
                 Task? sellTask = null;
 
@@ -82,6 +74,13 @@ namespace EbestTradeBot.Client.Services.Trade
 
                 try
                 {
+                    DateTime now = DateTime.Now;
+                    // 09:00 ~ 15:30 일경우 StopTrade() 호출
+                    if (now.Hour < 9 || now.TimeOfDay >= new TimeSpan(15, 31, 00))
+                    {
+                        throw new MarketClosedException();
+                    }
+
                     var searchedStocks = await SearchStocks();
                     if (_cancellationTokenSource.Token.IsCancellationRequested) break;
 
