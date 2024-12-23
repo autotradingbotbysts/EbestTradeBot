@@ -430,7 +430,7 @@ namespace EbestTradeBot.Client.Services.OpenApi
                 t0425InBlock = new
                 {
                     expcode = "",
-                    chegb = "0",
+                    chegb = "2",
                     medosu = "0",
                     sortgb = "1",
                     cts_ordno = "",

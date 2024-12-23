@@ -4,6 +4,7 @@ using EbestTradeBot.Client.EventArgs;
 using EbestTradeBot.Client.Services.Log;
 using EbestTradeBot.Client.Services.OpenApi;
 using EbestTradeBot.Client.Services.XingApi;
+using EbestTradeBot.Shared.Exceptions;
 using EbestTradeBot.Shared.Models.Log;
 using EbestTradeBot.Shared.Models.Trade;
 using Microsoft.Extensions.Options;
@@ -70,8 +71,7 @@ namespace EbestTradeBot.Client.Services.Trade
                 // 09:00 ~ 15:30 일경우 StopTrade() 호출
                 if (now.Hour < 9 || now.TimeOfDay >= new TimeSpan(15, 31, 00))
                 {
-                    await StopTrade();
-                    break;
+                    throw new MarketClosedException();
                 }
 
                 Task? buyTask = null;
@@ -149,6 +149,10 @@ namespace EbestTradeBot.Client.Services.Trade
                             }
                         }
                     });
+                }
+                catch(MarketClosedException)
+                {
+                    continue;
                 }
                 catch(Exception)
                 {
