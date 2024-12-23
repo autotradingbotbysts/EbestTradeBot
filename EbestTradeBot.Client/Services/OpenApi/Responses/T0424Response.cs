@@ -28,5 +28,7 @@ namespace EbestTradeBot.Client.Services.OpenApi.Responses
         public int Mdposqt { get; set; } = int.MinValue;
         [JsonPropertyName("hname")]
         public string Hname { get; set; } = string.Empty;
+        [JsonPropertyName("pamt")]
+        public int Pamt { get; set; } = int.MinValue;
     }
 }
