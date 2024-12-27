@@ -391,10 +391,6 @@ namespace EbestTradeBot.Client.Services.OpenApi
             {
                 _token = string.Empty;
             }
-
-            _token = string.Empty;
-
-            return responseData;
         }
 
         public async Task<List<Stock>> GetTradingStocks(CancellationToken cancellationToken)
