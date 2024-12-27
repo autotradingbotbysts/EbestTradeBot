@@ -48,7 +48,7 @@ namespace EbestTradeBot.Client.ViewModels
             catch(Exception ex)
             {
                 AddBoard($"[ERROR] {ex.Message}");
-                await OnStopped();
+                await SetRun(false);
             }
         }
 
