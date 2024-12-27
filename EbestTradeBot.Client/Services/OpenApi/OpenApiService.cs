@@ -360,33 +360,38 @@ namespace EbestTradeBot.Client.Services.OpenApi
 
         public async Task<RevokeResponse> RevokeToken()
         {
-            var parameters = new Dictionary<string, string>
+            try
             {
-                { "appkey", _openApiOptions.AppKey },
-                { "appsecretkey", _openApiOptions.SecretKey },
-                { "token_type_hint", "access_token" },
-                { "token", _token }
-            };
+                var parameters = new Dictionary<string, string>
+                {
+                    { "appkey", _openApiOptions.AppKey },
+                    { "appsecretkey", _openApiOptions.SecretKey },
+                    { "token_type_hint", "access_token" },
+                    { "token", _token }
+                };
 
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"));
+                using var client = new HttpClient();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"));
 
-            var content = new FormUrlEncodedContent(parameters);
+                var content = new FormUrlEncodedContent(parameters);
 
-            var response = await client.PostAsync($"{_url}{_tokenRevokePath}", content);
+                var response = await client.PostAsync($"{_url}{_tokenRevokePath}", content);
 
-            string responseString = await response.Content.ReadAsStringAsync();
-            var responseData = JsonSerializer.Deserialize<RevokeResponse>(responseString) ?? throw new Exception($"{responseString}");
+                string responseString = await response.Content.ReadAsStringAsync();
+                var responseData = JsonSerializer.Deserialize<RevokeResponse>(responseString) ?? throw new Exception($"{responseString}");
 
-            if(!response.IsSuccessStatusCode)
-            {
-                var errorMessage = await response.Content.ReadAsStringAsync();
-                ThrowErrorByMessage(errorMessage);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    ThrowErrorByMessage(errorMessage);
+                }
+
+                return responseData;
             }
-
-            _token = string.Empty;
-
-            return responseData;
+            finally
+            {
+                _token = string.Empty;
+            }
         }
 
         public async Task<List<Stock>> GetTradingStocks(CancellationToken cancellationToken)
@@ -448,6 +453,7 @@ namespace EbestTradeBot.Client.Services.OpenApi
             throw code switch
             {
                 "IGW00121" => new InvalidTokenException(code, message), // 유효하지 않은 token 입니다.
+                "IGW00105" => new ArgumentException($"[{code}] {message}"), // 유효하지 않은 AppSecret입니다.
                 _ => new Exception($"[{code}] {message}"),
             };
         }

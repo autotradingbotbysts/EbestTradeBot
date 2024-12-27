@@ -10,9 +10,11 @@ using EbestTradeBot.Shared.Models.Trade;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using XA_DATASETLib;
@@ -61,8 +63,8 @@ namespace EbestTradeBot.Client.Services.Trade
         {
             WriteLog?.Invoke(this, new LogEventArgs("매매를 시작합니다."));
             _cancellationTokenSource = new();
-            await _openApi.InitToken(_cancellationTokenSource.Token);
-            if (_cancellationTokenSource.Token.IsCancellationRequested) return;
+
+            await InitToken();
 
             while (!_cancellationTokenSource.Token.IsCancellationRequested)
             {
@@ -93,6 +95,9 @@ namespace EbestTradeBot.Client.Services.Trade
                     var tradingStocks = await GetTradingShcodes();
                     if (_cancellationTokenSource.Token.IsCancellationRequested) break;
 
+                    var recentlyTradingStocks = await GetRecentlyTradingStocks();
+                    if (_cancellationTokenSource.Token.IsCancellationRequested) break;
+
                     buyTask = Task.Run(async () =>
                     {
                         // 1차 매수
@@ -102,11 +107,12 @@ namespace EbestTradeBot.Client.Services.Trade
                                 stock.매수가_1차 >= stock.현재가 && // 1차 매수가 도착
                                 !(stock.현재가 > stock.익절가 || stock.현재가 < stock.손절가) && // 익절가, 손절가 범위 내
                                 !accountStocksForBuying.Any(x => x.Shcode == stock.Shcode) && // 보유중인 종목이 아님
+                                !recentlyTradingStocks.Contains(stock.Shcode) && // 최근 매매한 종목이 아님
                                 !tradingStocks.Contains(stock.Shcode)) // 현재 매매중인 종목이 아님
                             {
                                 // 매수
                                 WriteLog?.Invoke(this, new LogEventArgs($"[{stock.Hname}({stock.Shcode})] [1차 매수]"));
-                                await _log.WriteLog(new() { StockName = stock.Hname, Note = "1차 매수" });
+                                await _log.WriteLog(new() { StockName = stock.Hname, StockCode = stock.Shcode, Note = "1차 매수" });
                                 await BuyStock(stock);
                                 if (_cancellationTokenSource.Token.IsCancellationRequested) break;
                             }
@@ -125,7 +131,7 @@ namespace EbestTradeBot.Client.Services.Trade
                             {
                                 // 매수
                                 WriteLog?.Invoke(this, new LogEventArgs($"[{stock.Hname}({stock.Shcode})] [2차 매수]"));
-                                await _log.WriteLog(new() { StockName = stock.Hname, Note = "2차 매수" });
+                                await _log.WriteLog(new() { StockName = stock.Hname, StockCode = stock.Shcode, Note = "2차 매수" });
                                 await BuyStock(stock);
                                 if (_cancellationTokenSource.Token.IsCancellationRequested) break;
                             }
@@ -142,18 +148,21 @@ namespace EbestTradeBot.Client.Services.Trade
                             {
                                 // 매도
                                 WriteLog?.Invoke(this, new LogEventArgs($"[{stock.Hname}({stock.Shcode})] [매도]"));
-                                await _log.WriteLog(new() { StockName = stock.Hname, Note = "매도" });
+                                await _log.WriteLog(new() { StockName = stock.Hname, StockCode = stock.Shcode, Note = "매도" });
                                 await SellStock(stock);
                                 if (_cancellationTokenSource.Token.IsCancellationRequested) break;
                             }
                         }
                     });
                 }
-                catch(InvalidTokenException)
+                catch(ArgumentException ex)
                 {
-                    WriteLog?.Invoke(this, new LogEventArgs("토큰이 유효하지 않습니다. 새로운 토큰을 발급합니다."));
-                    await _openApi.InitToken(_cancellationTokenSource.Token);
-                    if (_cancellationTokenSource.Token.IsCancellationRequested) break;
+                    WriteLog?.Invoke(this, new LogEventArgs(ex.Message));
+                }
+                catch (InvalidTokenException ex)
+                {
+                    WriteLog?.Invoke(this, new LogEventArgs($"[{ex.Code}] {ex.Message}"));
+                    await InitToken();
                 }
                 catch(MarketClosedException)
                 {
@@ -194,10 +203,30 @@ namespace EbestTradeBot.Client.Services.Trade
             WriteLog?.Invoke(this, new LogEventArgs("매매를 종료합니다."));
 
             _cancellationTokenSource.Cancel();
-            await _openApi.RevokeToken();
+            await RevokeToken();
             StopTradeEvent?.Invoke(this, new());
 
             WriteLog?.Invoke(this, new LogEventArgs("매매를 성공적으로 종료했습니다."));
+        }
+
+        private async Task<List<string>> GetRecentlyTradingStocks()
+        {
+            var logs = await _log.GetLogs();
+
+            var baseDate = DateTime.Now.AddDays((_defaultOptions.CooldownDay * -1));
+
+            return logs.Where(x => x.Note.Equals("매도") && x.Date > baseDate).Select(x => x.StockCode).Distinct().ToList();
+        }
+
+        private async Task RevokeToken()
+        {
+            await _openApi.RevokeToken();
+            WriteLog?.Invoke(this, new LogEventArgs("토큰을 성공적으로 폐기했습니다."));
+        }
+        private async Task InitToken()
+        {
+            await _openApi.InitToken(_cancellationTokenSource.Token);
+            WriteLog?.Invoke(this, new LogEventArgs("토큰을 성공적으로 초기화했습니다."));
         }
 
         private async Task<List<string>> GetTradingShcodes()
