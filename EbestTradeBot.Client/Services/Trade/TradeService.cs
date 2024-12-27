@@ -149,6 +149,12 @@ namespace EbestTradeBot.Client.Services.Trade
                         }
                     });
                 }
+                catch(InvalidTokenException)
+                {
+                    WriteLog?.Invoke(this, new LogEventArgs("토큰이 유효하지 않습니다. 새로운 토큰을 발급합니다."));
+                    await _openApi.InitToken(_cancellationTokenSource.Token);
+                    if (_cancellationTokenSource.Token.IsCancellationRequested) break;
+                }
                 catch(MarketClosedException)
                 {
                     continue;
