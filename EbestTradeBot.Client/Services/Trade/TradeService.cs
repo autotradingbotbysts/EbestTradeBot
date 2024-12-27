@@ -159,7 +159,7 @@ namespace EbestTradeBot.Client.Services.Trade
                 {
                     WriteLog?.Invoke(this, new LogEventArgs(ex.Message));
                 }
-                catch (InvalidTokenException ex)
+                catch(InvalidTokenException ex)
                 {
                     WriteLog?.Invoke(this, new LogEventArgs($"[{ex.Code}] {ex.Message}"));
                     await InitToken();

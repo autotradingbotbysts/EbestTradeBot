@@ -341,7 +341,7 @@ namespace EbestTradeBot.Client.Services.OpenApi
 
             var response = await client.PostAsync($"{_url}{_tokenPath}", content, cancellationToken);
             if (cancellationToken.IsCancellationRequested) return new();
-
+            
             string responseString = await response.Content.ReadAsStringAsync(cancellationToken);
             if (cancellationToken.IsCancellationRequested) return new();
 
@@ -374,7 +374,6 @@ namespace EbestTradeBot.Client.Services.OpenApi
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"));
 
                 var content = new FormUrlEncodedContent(parameters);
-
                 var response = await client.PostAsync($"{_url}{_tokenRevokePath}", content);
 
                 string responseString = await response.Content.ReadAsStringAsync();
@@ -392,6 +391,10 @@ namespace EbestTradeBot.Client.Services.OpenApi
             {
                 _token = string.Empty;
             }
+
+            _token = string.Empty;
+
+            return responseData;
         }
 
         public async Task<List<Stock>> GetTradingStocks(CancellationToken cancellationToken)
