@@ -11,7 +11,7 @@ namespace EbestTradeBot.Client.Services.Log
     public class LogService : ILogService
     {
         private readonly string _filePath = @".\";
-        private readonly static object _lock = new object();
+        private static readonly object _lock = new();
 
         public async Task WriteLog(LogModel model)
         {
