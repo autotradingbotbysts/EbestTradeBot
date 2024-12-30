@@ -11,47 +11,54 @@ namespace EbestTradeBot.Client.Services.Log
     public class LogService : ILogService
     {
         private readonly string _filePath = @".\";
+        private readonly static object _lock = new object();
 
         public async Task WriteLog(LogModel model)
         {
-            var filePath = $"{_filePath}log.csv";
-            var fileExists = File.Exists(filePath);
-            if (!fileExists)
+            lock (_lock)
             {
-                File.Create(filePath).Dispose();
-            }
+                var filePath = $"{_filePath}log.csv";
+                var fileExists = File.Exists(filePath);
+                if (!fileExists)
+                {
+                    File.Create(filePath).Dispose();
+                }
 
-            using var writer = new StreamWriter(filePath, true);
-            using var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = !fileExists });
-            
-            if(!fileExists)
-            {
-                csv.WriteHeader<LogModel>();
+                using var writer = new StreamWriter(filePath, true);
+                using var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = !fileExists });
+
+                if (!fileExists)
+                {
+                    csv.WriteHeader<LogModel>();
+                    csv.NextRecord();
+                }
+
+                csv.WriteRecord(model);
                 csv.NextRecord();
             }
-
-            csv.WriteRecord(model);
-            csv.NextRecord();
         }
 
         public async Task<List<LogModel>> GetLogs()
         {
-            var filePath = $"{_filePath}log.csv";
-            if (!File.Exists(filePath))
+            lock(_lock)
             {
-                File.Create(filePath).Dispose();
+                var filePath = $"{_filePath}log.csv";
+                if (!File.Exists(filePath))
+                {
+                    File.Create(filePath).Dispose();
+                }
+
+                var ret = new List<LogModel>();
+
+                using var reader = new StreamReader(filePath);
+                using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture));
+                while (csv.Read())
+                {
+                    ret.Add(csv.GetRecord<LogModel>());
+                }
+
+                return ret;
             }
-
-            var ret = new List<LogModel>();
-
-            using var reader = new StreamReader(filePath);
-            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture));
-            while (csv.Read())
-            {
-                ret.Add(csv.GetRecord<LogModel>());
-            }
-
-            return ret;
         }
     }
 }
