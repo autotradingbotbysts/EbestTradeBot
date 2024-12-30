@@ -51,37 +51,32 @@
         </GroupBox>
         <GroupBox DockPanel.Dock="Top" Margin="2.5" Header="매매 설정">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="2.5">
-                <StackPanel Orientation="Horizontal" Margin="2.5" HorizontalAlignment="Right">
-                    <TextBlock Text="계좌번호 :" Margin="2.5" VerticalAlignment="Center"/>
-                    <TextBox Margin="2.5" Width="125" VerticalAlignment="Center"
-                             Text="{Binding XingApiOptions.AccountNumber}"/>
-                    <TextBlock Text="비밀번호 :" Margin="2.5" VerticalAlignment="Center"/>
-                    <PasswordBox x:Name="AccountPassword" Width="125" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="2.5"
-                                 PasswordChanged="Password_OnPasswordChanged"/>
-                    <TextBlock Text="호출주기(초) :" Margin="2.5" VerticalAlignment="Center"/>
+
+				<StackPanel Orientation="Horizontal" Margin="2.5" HorizontalAlignment="Right">
+					<TextBlock Text="거래쿨타임 :" Margin="2.5" VerticalAlignment="Center"/>
+					<TextBox Margin="2.5" Width="125" VerticalAlignment="Center">
+						<TextBox.Text>
+							<Binding Path="DefaultOptions.CooldownDay" StringFormat="N0"/>
+						</TextBox.Text>
+					</TextBox>
+					<TextBlock Text="거래금액 :" Margin="2.5" VerticalAlignment="Center"/>
+					<TextBox Margin="2.5" Width="125" VerticalAlignment="Center">
+						<TextBox.Text>
+							<Binding Path="DefaultOptions.TradePrice" StringFormat="N0"/>
+						</TextBox.Text>
+					</TextBox>
+					<TextBlock Text="    일봉설정 :" Margin="2.5" VerticalAlignment="Center"/>
+					<TextBox Margin="2.5" Width="125" VerticalAlignment="Center">
+						<TextBox.Text>
+							<Binding Path="OpenApiOptions.DayCount" StringFormat="N0"/>
+						</TextBox.Text>
+					</TextBox>
+				</StackPanel>
+				<StackPanel Orientation="Horizontal" Margin="2.5" HorizontalAlignment="Right">
+					<TextBlock Text="호출주기(초) :" Margin="2.5" VerticalAlignment="Center"/>
                     <TextBox Margin="2.5" Width="125" VerticalAlignment="Center">
                         <TextBox.Text>
 							<Binding Path="DefaultOptions.ReplySecond" StringFormat="N0"/>
-                        </TextBox.Text>
-                    </TextBox>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="2.5" HorizontalAlignment="Right">
-                    <TextBlock Text="거래쿨타임 :" Margin="2.5" VerticalAlignment="Center"/>
-                    <TextBox Margin="2.5" Width="125" VerticalAlignment="Center">
-                        <TextBox.Text>
-							<Binding Path="DefaultOptions.CooldownDay" StringFormat="N0"/>
-                        </TextBox.Text>
-                    </TextBox>
-                    <TextBlock Text="거래금액 :" Margin="2.5" VerticalAlignment="Center"/>
-                    <TextBox Margin="2.5" Width="125" VerticalAlignment="Center">
-                        <TextBox.Text>
-							<Binding Path="DefaultOptions.TradePrice" StringFormat="N0"/>
-                        </TextBox.Text>
-                    </TextBox>
-                    <TextBlock Text="    일봉설정 :" Margin="2.5" VerticalAlignment="Center"/>
-                    <TextBox Margin="2.5" Width="125" VerticalAlignment="Center">
-                        <TextBox.Text>
-							<Binding Path="OpenApiOptions.DayCount" StringFormat="N0"/>
                         </TextBox.Text>
                     </TextBox>
                 </StackPanel>

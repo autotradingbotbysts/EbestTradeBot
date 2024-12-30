@@ -25,20 +25,6 @@ namespace EbestTradeBot.Client.Services.XingApi
             set => SetProperty(ref _certificationPassword, value);
         }
 
-        private string _accountNumber = string.Empty;
-        public string AccountNumber
-        {
-            get => _accountNumber;
-            set => SetProperty(ref _accountNumber, value);
-        }
-
-        private string _accountPassword = string.Empty;
-        public string AccountPassword
-        {
-            get => _accountPassword;
-            set => SetProperty(ref _accountPassword, value);
-        }
-
         private string _acfFilePath = string.Empty;
         public string AcfFilePath
         {

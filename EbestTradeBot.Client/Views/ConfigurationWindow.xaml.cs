@@ -21,7 +21,6 @@ namespace EbestTradeBot.Client.Views
             
             Password.Password = _viewModel.XingApiOptions.XingApiPassword;
             CertificationPassword.Password = _viewModel.XingApiOptions.CertificationPassword;
-            AccountPassword.Password = _viewModel.XingApiOptions.AccountPassword;
         }
 
         private void Password_OnPasswordChanged(object sender, RoutedEventArgs e)
@@ -35,9 +34,6 @@ namespace EbestTradeBot.Client.Views
                     break;
                 case "CertificationPassword":
                     _viewModel.XingApiOptions.CertificationPassword = passwordBox.Password;
-                    break;
-                case "AccountPassword":
-                    _viewModel.XingApiOptions.AccountPassword = passwordBox.Password;
                     break;
                     
             }
