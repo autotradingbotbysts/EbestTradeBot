@@ -14,9 +14,14 @@ namespace EbestTradeBot.Client.Services.Log
 
         public async Task WriteLog(LogModel model)
         {
-            bool fileExists = File.Exists(_filePath + "log.csv");
+            var filePath = $"{_filePath}log.csv";
+            var fileExists = File.Exists(filePath);
+            if (!fileExists)
+            {
+                File.Create(filePath).Dispose();
+            }
 
-            using var writer = new StreamWriter(_filePath + "log.csv", true);
+            using var writer = new StreamWriter(filePath, true);
             using var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = !fileExists });
             
             if(!fileExists)
@@ -31,9 +36,15 @@ namespace EbestTradeBot.Client.Services.Log
 
         public async Task<List<LogModel>> GetLogs()
         {
+            var filePath = $"{_filePath}log.csv";
+            if (!File.Exists(filePath))
+            {
+                File.Create(filePath).Dispose();
+            }
+
             var ret = new List<LogModel>();
 
-            using var reader = new StreamReader(_filePath + "log.csv");
+            using var reader = new StreamReader(filePath);
             using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture));
             while (csv.Read())
             {
