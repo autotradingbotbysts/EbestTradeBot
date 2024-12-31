@@ -451,8 +451,9 @@ namespace EbestTradeBot.Client.Services.OpenApi
 
             throw code switch
             {
-                "IGW00121" => new InvalidTokenException(code, message), // 유효하지 않은 token 입니다.
                 "IGW00105" => new ArgumentException($"[{code}] {message}"), // 유효하지 않은 AppSecret입니다.
+                "IGW00121" => new InvalidTokenException(code, message), // 유효하지 않은 token 입니다.
+                "IGW00201" => new TooManyRequestException(code, message), // 호출 거래건수를 초과하였습니다.
                 _ => new Exception($"[{code}] {message}"),
             };
         }

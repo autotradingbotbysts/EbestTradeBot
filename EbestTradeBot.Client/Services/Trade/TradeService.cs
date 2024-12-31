@@ -155,7 +155,11 @@ namespace EbestTradeBot.Client.Services.Trade
                         }
                     });
                 }
-                catch(ArgumentException ex)
+                catch (TooManyRequestException ex)
+                {
+                    WriteLog?.Invoke(this, new LogEventArgs(($"[{ex.Code}] {ex.Message}")));
+                }
+                catch (ArgumentException ex)
                 {
                     WriteLog?.Invoke(this, new LogEventArgs(ex.Message));
                 }
