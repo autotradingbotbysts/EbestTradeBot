@@ -31,5 +31,11 @@ namespace EbestTradeBot.Client.Services.XingApi
             get => _acfFilePath;
             set => SetProperty(ref _acfFilePath, value);
         }
+        private string _resFilePath = string.Empty;
+        public string ResFilePath
+        {
+            get => _resFilePath;
+            set => SetProperty(ref _resFilePath, value);
+        }
     }
 }

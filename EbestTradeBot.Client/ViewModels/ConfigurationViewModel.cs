@@ -23,7 +23,7 @@ namespace EbestTradeBot.Client.ViewModels
 
         public DelegateCommand SaveCommand { get; private set; }
         public DelegateCommand LoginXingApiCommand { get; private set; }
-        public DelegateCommand FileDialogCommand { get; private set; }
+        public DelegateCommand<string> FileDialogCommand { get; private set; }
         public DelegateCommand CancelCommand { get; private set; }
         public Action? CloseWindowAction { get; set; }
 
@@ -40,7 +40,7 @@ namespace EbestTradeBot.Client.ViewModels
 
             SaveCommand = new DelegateCommand(ExecuteSaveCommand);
             LoginXingApiCommand = new DelegateCommand(ExecuteLoginXingApiCommand);
-            FileDialogCommand = new DelegateCommand(ExecuteFileDialogCommand);
+            FileDialogCommand = new DelegateCommand<string>(ExecuteFileDialogCommand);
             CancelCommand = new DelegateCommand(ExecuteCancelCommand);
         }
 
@@ -48,14 +48,31 @@ namespace EbestTradeBot.Client.ViewModels
 
         #region DelegateCommand Execute
 
-        private void ExecuteFileDialogCommand()
+        private void ExecuteFileDialogCommand(string type)
         {
             var ofd = new OpenFileDialog();
-            ofd.Filter = "ACF files (*.acf)|*.acf|All files (*.*)|*.*";
+
+            switch (type.ToLower())
+            {
+                case "acf":
+                    ofd.Filter = "ACF files (*.acf)|*.acf|All files (*.*)|*.*";
+                    break;
+                case "res":
+                    ofd.Filter = "RES files (*.res)|*.res|All files (*.*)|*.*";
+                    break;
+            }
             bool result = ofd.ShowDialog() ?? false;
             if (result)
             {
-                XingApiOptions.AcfFilePath = ofd.FileName;
+                switch (type.ToLower())
+                {
+                    case "acf":
+                        XingApiOptions.AcfFilePath = ofd.FileName;
+                        break;
+                    case "res":
+                        XingApiOptions.ResFilePath = ofd.FileName;
+                        break;
+                }
             }
         }
 

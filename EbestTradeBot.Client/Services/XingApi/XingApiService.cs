@@ -23,8 +23,8 @@ namespace EbestTradeBot.Client.Services.XingApi
             _xingApiOptionMonitor = xingApiOptionMonitor;
 
             ((_IXASessionEvents_Event)_xaSession).Login += OnLogin;
-            ((_IXAQueryEvents_Event)_xaQuery_t1857).ReceiveData += _xaQuery_t1857_OnReceiveData;
-            _xaQuery_t1857.ResFileName = @"Res\t1857.res";
+            ((_IXAQueryEvents_Event)_xaQuery_t1857).ReceiveData += _xaQuery_t1857_OnReceiveData; 
+            _xaQuery_t1857.ResFileName = _xingApiOptions.ResFilePath;
         }
 
         private void _xaQuery_t1857_OnReceiveData(string szTrCode)
