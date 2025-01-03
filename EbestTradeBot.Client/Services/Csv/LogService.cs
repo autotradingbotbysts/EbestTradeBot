@@ -45,7 +45,7 @@ namespace EbestTradeBot.Client.Services.Log
                 var filePath = $"{_filePath}log.csv";
                 if (!File.Exists(filePath))
                 {
-                    File.Create(filePath).Dispose();
+                    return [];
                 }
 
                 var ret = new List<LogModel>();

@@ -10,7 +10,7 @@
         xmlns:vm="clr-namespace:EbestTradeBot.Client.ViewModels" 
 				 d:DataContext="{d:DesignInstance Type=vm:ConfigurationViewModel}"
 				 prism:ViewModelLocator.AutoWireViewModel="True"
-        Title="옵션" Height="510" Width="640" ResizeMode="NoResize">
+        Title="옵션" Height="470" Width="640" ResizeMode="NoResize">
     <DockPanel Margin="2.5">
         <GroupBox DockPanel.Dock="Top" Margin="2.5" Header="Xing API">
             <StackPanel Orientation="Vertical" Margin="2.5">
