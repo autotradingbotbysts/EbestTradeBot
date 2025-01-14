@@ -354,10 +354,49 @@ namespace EbestTradeBot.Client.Services.Trade
             int nSuccess = _xaQuery_t1857.RequestService("t1857", "");
             if (nSuccess < 0)
             {
-                throw new Exception($"XingAPI t1857 TR 호출 실패[({nSuccess}){_xaSession.GetErrorMessage(nSuccess)}]");
+                ThrowXingApiErrorCode(nSuccess);
             }
 
             return await _searchTaskCompletionSource.Task;
+        }
+
+        private void ThrowXingApiErrorCode(int errorCode)
+        {
+            /*
+            -1 소켓생성 실패
+            -2 서버연결 실패
+            -3 서버주소가 맞지 않습니다.
+            -4 서버 연결시간 초과
+            -5 이미 서버에 연결중입니다.
+            -6 해당 TR은 사용할 수 없습니다.
+            -7 로그인이 필요합니다.
+            -8 시세전용에서는 사용이 불가능합니다.
+            -9 해당 계좌번호를 가지고 있지 않습니다.
+            -10 Packet의 크기가 잘못되었습니다.
+            -11 Data 크기가 다릅니다.
+            -12 계좌가 존재하지 않습니다.
+            -13 Request ID 부족
+            -14 소켓이 생성되지 않았습니다.
+            -15 암호화 생성에 실패했습니다.
+            -16 데이터 전송에 실패했습니다.
+            -17 암호화(RTN)처리에 실패했습니다.
+            -18 공인인증 파일이 없습니다.
+            -19 공인인증 Function이 없습니다.
+            -20 메모리가 충분하지 않습니다.
+            -21 TR의 초당 사용횟수 초과로 사용이 불가능합니다.
+            -22 해당 TR은 해당 함수를 이용할 수 없습니다.
+            -23 TR에 대한 정보를 찾을 수 없습니다.
+            -24 계좌위치가 지정되지 않았습니다.
+            -25 계좌를 가지고 있지 않습니다.
+            -26 파일 읽기에 실패했습니다. (종목 검색 조회 시, 파일이 없는 경우)
+            -27 실시간 종목검색 조건 등록이 10건을 초과하였습니다.
+            -28 등록 키에 대한 정보를 찾을 수 없습니다.(API->HTS 종목 연동 키 오류)
+             */
+            switch (errorCode)
+            {
+                case -21:
+                    throw new TooManyRequestException(errorCode.ToString(), "TR의 초당 사용횟수 초과로 사용이 불가능합니다.(XingAPI)");
+            }
         }
 
         private async Task Login()
