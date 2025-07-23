@@ -10,7 +10,7 @@ Windows Desktop (WPF)
 #### Language
 C#
 #### Framework
-.NET8, Prism
+.NET9, Prism
 #### Library
 CsvHelper, Microsoft.Extensions.Configuration, Newtonsoft.Json, MahApps.Metro
 #### API
